@@ -1,0 +1,39 @@
+{
+  "files": {
+    "main.css": "/musicplayer/static/css/main.8e767362.css",
+    "main.js": "/musicplayer/static/js/main.c12ebcda.js",
+    "static/media/Coldplay-The Scientist.m4a": "/musicplayer/static/media/Coldplay-The Scientist.b61d9f53564661c7609d.m4a",
+    "static/media/Coldplay-Every Teardrop Is A Waterfall.m4a": "/musicplayer/static/media/Coldplay-Every Teardrop Is A Waterfall.4613407b8722e6a6b4c0.m4a",
+    "static/media/Coldplay-Viva La Vida.m4a": "/musicplayer/static/media/Coldplay-Viva La Vida.da16f8294176d345e593.m4a",
+    "static/media/Coldplay-Princess Of China Feat Rihanna.m4a": "/musicplayer/static/media/Coldplay-Princess Of China Feat Rihanna.ea562e002ec7b68e557e.m4a",
+    "static/media/Imagine Dragons-Its Time.mp3": "/musicplayer/static/media/Imagine Dragons-Its Time.6b6e82021a80938c9c59.mp3",
+    "static/media/Coldplay-Speed of Sound.mp3": "/musicplayer/static/media/Coldplay-Speed of Sound.9085901d80cc5004982b.mp3",
+    "static/media/Coldplay-Xy.mp3": "/musicplayer/static/media/Coldplay-Xy.9edf90d4475156797de6.mp3",
+    "static/media/Imagine Dragons-On Top of the World.mp3": "/musicplayer/static/media/Imagine Dragons-On Top of the World.06658d435c11fc6919b8.mp3",
+    "static/media/Coldplay - Midnight.mp3": "/musicplayer/static/media/Coldplay - Midnight.b05831922835413a273b.mp3",
+    "static/media/Coldplay - Shiver.mp3": "/musicplayer/static/media/Coldplay - Shiver.0ff463649da3d3b13d3c.mp3",
+    "static/media/Coldplay - Talk.mp3": "/musicplayer/static/media/Coldplay - Talk.7b440273d3f27cfcf4f6.mp3",
+    "static/media/Coldplay - Clocks - String Quartet.mp3": "/musicplayer/static/media/Coldplay - Clocks - String Quartet.c5e2790b74948c19c602.mp3",
+    "static/media/Coldplay - The Hardest Part.mp3": "/musicplayer/static/media/Coldplay - The Hardest Part.677bd7eece71f181686a.mp3",
+    "static/media/Coldplay - Charlie Brown.mp3": "/musicplayer/static/media/Coldplay - Charlie Brown.4cfdb1e078476e9dda83.mp3",
+    "static/media/Coldplay - Yellow.mp3": "/musicplayer/static/media/Coldplay - Yellow.fd0ed4b49251d35e0b18.mp3",
+    "static/media/Coldplay - Christmas Lights.mp3": "/musicplayer/static/media/Coldplay - Christmas Lights.8279967609c92e8d6f30.mp3",
+    "static/media/Imagine Dragons - Radioactive.mp3": "/musicplayer/static/media/Imagine Dragons - Radioactive.8fa711a5a96547ffbc91.mp3",
+    "static/media/Coldplay - Clocks.mp3": "/musicplayer/static/media/Coldplay - Clocks.e3b31947614de7ad6b1b.mp3",
+    "static/media/Coldplay - Strawberry Swing.mp3": "/musicplayer/static/media/Coldplay - Strawberry Swing.5c9b0d6b168643221f23.mp3",
+    "static/media/Coldplay - Fix You.mp3": "/musicplayer/static/media/Coldplay - Fix You.a074821f3b30480211ca.mp3",
+    "static/media/Imagine Dragons - Demons (Official).mp3": "/musicplayer/static/media/Imagine Dragons - Demons (Official).ab3368b8f73cdeb8858f.mp3",
+    "static/media/Coldplay - In My Place.mp3": "/musicplayer/static/media/Coldplay - In My Place.d6ceb9b24e803eb41d29.mp3",
+    "static/media/Coldplay - Violet Hill.mp3": "/musicplayer/static/media/Coldplay - Violet Hill.103c646492f296541339.mp3",
+    "static/media/Imagine Dragons - Bleeding Out.mp3": "/musicplayer/static/media/Imagine Dragons - Bleeding Out.1648a3925e3df2b98912.mp3",
+    "static/media/Coldplay - Princess Of China ft. Rihanna.mp3": "/musicplayer/static/media/Coldplay - Princess Of China ft. Rihanna.cb43d91c877e972a1431.mp3",
+    "static/media/Coldplay - Hurts Like Heaven.mp3": "/musicplayer/static/media/Coldplay - Hurts Like Heaven.8d603e49019cc149b85f.mp3",
+    "index.html": "/musicplayer/index.html",
+    "main.8e767362.css.map": "/musicplayer/static/css/main.8e767362.css.map",
+    "main.c12ebcda.js.map": "/musicplayer/static/js/main.c12ebcda.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.8e767362.css",
+    "static/js/main.c12ebcda.js"
+  ]
+}
