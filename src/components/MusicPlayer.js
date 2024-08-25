@@ -53,12 +53,12 @@ const MediaPlayer = () => {
   };
 
   return (
-    <div style={{ display: 'flex', padding: '20px', justifyContent: 'center' }}>
-      <div style={{ flex: 1, marginRight: '20px' }}>
+    <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center'  }}>
+      <div style={{ marginBottom: '20px', width: '100%', maxWidth: '600px' }}>
         <h2 style={{ color: 'blue' }}>Now Playing </h2>
         {currentAudio ? (
           <>
-            <h2 style={{ color: 'red' }}>{currentAudio.title}</h2 >
+            <h3 style={{ color: 'red' }}>{currentAudio.title}</h3 >
             <audio
               ref={audioRef}
               controls
@@ -73,9 +73,9 @@ const MediaPlayer = () => {
           <p>No audio file selected</p>
         )}
       </div>
-      <div style={{ flex: 1 }}>
+      <div style={{ width: '100%', maxWidth: '600px' }}>
         <h3>Play List</h3>
-        <div style={{ marginTop: '10px', maxHeight: '600px', overflowY: 'auto' }}>
+        <div style={{ mmarginTop: '10px', maxHeight: '600px', overflowY: 'auto'}}>
           {audioFiles.map((audio, index) => (
             <button
               key={index}
