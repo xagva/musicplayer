@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { FaDownload } from 'react-icons/fa';
 
 // Function to import all audio files from the directory (supports .mp3 and .m4a)
 const importAll = (r) => {
@@ -88,8 +89,16 @@ const MediaPlayer = () => {
               >
                 {audio.title}
               </button>
-              <a href={audio.url} download>
-                <button style={{ margin: '5px', padding: '10px' }}>Download</button>
+              <a href={audio.url} download style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: '5px',
+                  backgroundColor: 'green',
+                  color: 'white',
+                  borderRadius: '5px',
+                  textDecoration: 'none',
+                }}>
+                <FaDownload size={20} />
               </a>
             </div>
           ))}
