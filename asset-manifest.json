@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/musicplayer/static/css/main.84de381f.css",
-    "main.js": "/musicplayer/static/js/main.1828938a.js",
+    "main.js": "/musicplayer/static/js/main.c8ed27ec.js",
     "static/media/Pink Floyd-Comfortably Numb.mp3": "/musicplayer/static/media/Pink Floyd-Comfortably Numb.efca324cf5366a59fe58.mp3",
     "static/media/Coldplay-The Scientist.m4a": "/musicplayer/static/media/Coldplay-The Scientist.b61d9f53564661c7609d.m4a",
     "static/media/01 - Born To Die.mp3": "/musicplayer/static/media/01 - Born To Die.da8a1833e62bcf7ec653.mp3",
@@ -116,10 +116,10 @@
     "static/media/linkin park - cure for the itch.mp3": "/musicplayer/static/media/linkin park - cure for the itch.3e23989e5d04683f85ad.mp3",
     "index.html": "/musicplayer/index.html",
     "main.84de381f.css.map": "/musicplayer/static/css/main.84de381f.css.map",
-    "main.1828938a.js.map": "/musicplayer/static/js/main.1828938a.js.map"
+    "main.c8ed27ec.js.map": "/musicplayer/static/js/main.c8ed27ec.js.map"
   },
   "entrypoints": [
     "static/css/main.84de381f.css",
-    "static/js/main.1828938a.js"
+    "static/js/main.c8ed27ec.js"
   ]
 }
