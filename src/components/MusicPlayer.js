@@ -74,21 +74,24 @@ const MediaPlayer = () => {
         )}
       </div>
       <div style={{ width: '100%', maxWidth: '600px' }}>
-        <h3>Play List</h3>
-        <div style={{ mmarginTop: '10px', maxHeight: '600px', overflowY: 'auto'}}>
+        <h3>Available tracks</h3>
+        <div style={{ marginTop: '10px', maxHeight: '600px', overflowY: 'auto' }}>
           {audioFiles.map((audio, index) => (
-            <button
-              key={index}
-              onClick={() => handleAudioChange(audio)}
-              style={{
-                display: 'block',
-                margin: '5px',
-                padding: '10px',
-                backgroundColor: currentAudio?.url === audio.url ? 'lightblue' : 'white',
-              }}
-            >
-              {audio.title}
-            </button>
+            <div key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <button
+                onClick={() => handleAudioChange(audio)}
+                style={{
+                  margin: '5px',
+                  padding: '10px',
+                  backgroundColor: currentAudio?.url === audio.url ? 'lightblue' : 'white',
+                }}
+              >
+                {audio.title}
+              </button>
+              <a href={audio.url} download>
+                <button style={{ margin: '5px', padding: '10px' }}>Download</button>
+              </a>
+            </div>
           ))}
         </div>
       </div>
