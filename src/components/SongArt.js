@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 // Generated cover art: every song gets its own design, seeded from its filename,
 // using its category's palette and motif (sun, moon, lightning, hearts, vinyl...).
@@ -385,6 +385,20 @@ const SongArt = ({ track, size = 'sm' }) => {
   const [light, dark] = art.colors;
   const id = `${size}-${art.seed}`;
   const { motif } = art;
+  const [broken, setBroken] = useState(false);
+
+  // Real album cover when one was found; generated art otherwise or if it fails to load
+  if (track.cover && !broken) {
+    return (
+      <img
+        className={`cover cover-${size} cover-img`}
+        src={track.cover}
+        alt=""
+        loading="lazy"
+        onError={() => setBroken(true)}
+      />
+    );
+  }
 
   return (
     <svg className={`cover cover-${size}`} viewBox="0 0 100 100" aria-hidden="true" preserveAspectRatio="xMidYMid slice">

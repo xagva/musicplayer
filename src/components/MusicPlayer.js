@@ -7,14 +7,17 @@ import CategoryScene from './CategoryScene';
 import SongArt from './SongArt';
 import { CATEGORIES, categorize } from '../categories';
 import { parseTrack } from '../trackInfo';
+import covers from '../covers.json';
 
 // Function to import all audio files from the directory, tagging each with a category
+// and its album cover (from scripts/fetch-covers.js) when one was found
 const importAll = (r) => {
   let files = [];
   r.keys().forEach((item) => {
     const url = r(item);
     const title = item.replace('./', '').split('/').pop();
-    files.push({ title, url, category: categorize(title), ...parseTrack(title) });
+    const cover = covers[title] ? `${process.env.PUBLIC_URL}/${covers[title]}` : null;
+    files.push({ title, url, cover, category: categorize(title), ...parseTrack(title) });
   });
   return files;
 };
@@ -83,6 +86,7 @@ const MediaPlayer = () => {
       navigator.mediaSession.metadata = new window.MediaMetadata({
         title: currentAudio.name,
         artist: currentAudio.artist || CATEGORIES[currentAudio.category].label,
+        artwork: currentAudio.cover ? [{ src: currentAudio.cover, sizes: '400x400', type: 'image/jpeg' }] : [],
       });
     }
   }, [currentAudio]);

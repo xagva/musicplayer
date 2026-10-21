@@ -906,3 +906,10 @@ a:focus-visible,
     animation: none;
   }
 }
+
+/* Album cover photos fill their tile */
+.cover-img {
+  display: block;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.08);
+}
