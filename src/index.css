@@ -2,19 +2,154 @@ body {
   font-family: Arial, sans-serif;
   margin: 0px;
   padding: 0px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #f0f0f0;
+  min-height: 100vh;
+  background-color: #0b0b12;
+  color: #fff;
 }
 
 .App {
   text-align: center;
-  background-color: #fff;
-  padding: 20px;
-  padding-top: 300px;
-  margin-top: 0px;
+  position: relative;
+  min-height: 100vh;
+}
+
+.App h1 {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 24px 16px 8px;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* Animated category background */
+.scene {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+}
+
+.player {
+  position: relative;
+  z-index: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.panel {
+  width: 100%;
+  max-width: 640px;
+  box-sizing: border-box;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(10, 10, 20, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.now-playing h2 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  opacity: 0.8;
+}
+
+.now-playing h3 {
+  margin: 10px 0;
+  overflow-wrap: anywhere;
+}
+
+.now-playing audio {
+  width: 100%;
+  margin-top: 6px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--accent, #888);
+  color: #111;
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.chip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--accent, #fff);
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.chip.active {
+  background: var(--accent, #fff);
+  color: #111;
+  font-weight: bold;
+}
+
+.tracks {
+  max-height: 55vh;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.track-btn {
+  flex: 1;
+  min-width: 0;
+  padding: 10px;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid transparent;
+  border-left: 4px solid var(--accent, #fff);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.track-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.track-btn.active {
+  background: var(--accent, #fff);
+  color: #111;
+  font-weight: bold;
+}
+
+.track-emoji {
+  margin-right: 8px;
+}
+
+.download {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px;
+  background-color: green;
+  color: white;
+  border-radius: 8px;
 }
