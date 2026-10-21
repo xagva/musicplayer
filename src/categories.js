@@ -1,15 +1,16 @@
 // Song categories and the filename rules used to assign them.
 // Rules are checked in order and the first match wins; anything unmatched is Romance.
 
+// `art` is the gradient used for the category's cover tiles
 export const CATEGORIES = {
-  devotional: { label: 'Devotional', emoji: '🪔', accent: '#ffb347' },
-  sufi: { label: 'Sufi', emoji: '🌙', accent: '#e8c872' },
-  rock: { label: 'Rock', emoji: '🎸', accent: '#ff3b3b' },
-  party: { label: 'Party', emoji: '🪩', accent: '#ff4fd8' },
-  romance: { label: 'Romance', emoji: '💖', accent: '#ff6f91' },
-  retro: { label: 'Retro', emoji: '📻', accent: '#d9a066' },
-  rainy: { label: 'Rainy Mood', emoji: '🌧️', accent: '#7fb3d5' },
-  dreamy: { label: 'Dreamy', emoji: '🌌', accent: '#7ee8c7' },
+  devotional: { label: 'Devotional', emoji: '🪔', accent: '#ffb347', art: 'linear-gradient(135deg, #ffb347, #a0300a)', tagline: 'Bhajans, aartis and kirtans to start the day' },
+  sufi: { label: 'Sufi', emoji: '🌙', accent: '#e8c872', art: 'linear-gradient(135deg, #e8c872, #3b2466)', tagline: 'Qawwali-soaked soul for late nights' },
+  rock: { label: 'Rock', emoji: '🎸', accent: '#ff4d4d', art: 'linear-gradient(135deg, #ff4d4d, #2a0000)', tagline: 'Loud guitars, big choruses, no skips' },
+  party: { label: 'Party', emoji: '🪩', accent: '#ff4fd8', art: 'linear-gradient(135deg, #ff4fd8, #4f3bff)', tagline: 'Turn it up and hit the floor' },
+  romance: { label: 'Romance', emoji: '💖', accent: '#ff7aa2', art: 'linear-gradient(135deg, #ff9ab8, #8e2a52)', tagline: 'Love songs, old and new' },
+  retro: { label: 'Retro', emoji: '📻', accent: '#e0a96d', art: 'linear-gradient(135deg, #e0a96d, #4a2f17)', tagline: 'Golden-era classics on vinyl' },
+  rainy: { label: 'Rainy Mood', emoji: '🌧️', accent: '#8ec5e8', art: 'linear-gradient(135deg, #8ec5e8, #1c2833)', tagline: 'For grey skies and quiet thoughts' },
+  dreamy: { label: 'Dreamy', emoji: '🌌', accent: '#7ee8c7', art: 'linear-gradient(135deg, #7ee8c7, #2b2f8f)', tagline: 'Starry, floaty, headphones-on music' },
 };
 
 const RULES = [
