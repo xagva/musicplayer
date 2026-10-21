@@ -199,14 +199,14 @@ const MediaPlayer = () => {
 
   const category = currentAudio ? CATEGORIES[currentAudio.category] : null;
   const view = filter === 'all'
-    ? { label: 'All Songs', emoji: '🎵', art: 'linear-gradient(135deg, #8b5cf6, #ec4899 50%, #f59e0b)', tagline: 'Everything in your library' }
+    ? { label: 'All Songs', emoji: '🎵', art: 'linear-gradient(135deg, #7ff0f8, #22d3e6 45%, #0e7490)', tagline: 'Everything in your library' }
     : CATEGORIES[filter];
   const viewPlaying = playing && visibleTracks.some((a) => a.url === currentAudio?.url);
   const countFor = (key) => audioFiles.filter((a) => a.category === key).length;
   const progress = duration ? (time / duration) * 100 : 0;
 
   return (
-    <div className="app-shell" style={{ '--accent': category?.accent || '#8b5cf6' }}>
+    <div className="app-shell">
       <CategoryScene category={currentAudio?.category} playing={playing} analyserRef={analyserRef} />
       <div className="scrim" />
 
@@ -218,7 +218,7 @@ const MediaPlayer = () => {
         <p className="nav-heading">Your library</p>
         <nav className="nav">
           <button className={filter === 'all' ? 'nav-item active' : 'nav-item'} onClick={() => setFilter('all')}>
-            <span className="nav-cover" style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)' }}>🎵</span>
+            <span className="nav-cover" style={{ background: 'linear-gradient(135deg, #7ff0f8, #0e7490)' }}>🎵</span>
             <span className="nav-text">
               <strong>All Songs</strong>
               <small>{audioFiles.length} songs</small>

@@ -1,11 +1,14 @@
 :root {
-  --bg: #08080c;
-  --surface: rgba(18, 18, 24, 0.62);
-  --surface-strong: rgba(14, 14, 19, 0.86);
-  --border: rgba(255, 255, 255, 0.08);
-  --text: #f5f5f7;
-  --muted: #a1a1aa;
-  --hover: rgba(255, 255, 255, 0.07);
+  --accent: #22d3e6;
+  --accent-light: #7ff0f8;
+  --on-accent: #032a31;
+  --bg: #03171d;
+  --surface: rgba(4, 34, 42, 0.62);
+  --surface-strong: rgba(3, 30, 38, 0.84);
+  --border: rgba(127, 240, 248, 0.12);
+  --text: #effdfe;
+  --muted: #93bfc7;
+  --hover: rgba(127, 240, 248, 0.08);
   --player-h: 92px;
   --sidebar-w: 280px;
 }
@@ -54,7 +57,7 @@ button {
   z-index: 0;
   pointer-events: none;
   background:
-    linear-gradient(180deg, rgba(8, 8, 12, 0) 0%, rgba(8, 8, 12, 0.35) 50%, rgba(8, 8, 12, 0.75) 100%);
+    linear-gradient(180deg, rgba(3, 23, 29, 0) 0%, rgba(3, 23, 29, 0.3) 50%, rgba(3, 23, 29, 0.78) 100%);
 }
 
 .sidebar,
@@ -97,8 +100,8 @@ button {
   width: 34px;
   height: 34px;
   border-radius: 10px;
-  background: var(--accent);
-  color: #0b0b10;
+  background: linear-gradient(135deg, var(--accent-light), var(--accent));
+  color: var(--on-accent);
   font-size: 1.1rem;
   transition: background 0.6s ease;
 }
@@ -137,7 +140,8 @@ button {
 }
 
 .nav-item.active {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(34, 211, 230, 0.16);
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
 .nav-cover {
@@ -177,8 +181,8 @@ button {
   background: linear-gradient(
     180deg,
     color-mix(in srgb, var(--accent) 16%, transparent) 0,
-    rgba(14, 14, 19, 0.25) 380px,
-    rgba(14, 14, 19, 0.7) 640px
+    rgba(3, 30, 38, 0.25) 380px,
+    rgba(3, 30, 38, 0.74) 640px
   );
   border: 1px solid var(--border);
   padding: 16px 24px 24px;
@@ -249,8 +253,8 @@ button {
 }
 
 .chip.active {
-  background: var(--text);
-  color: #0b0b10;
+  background: var(--accent);
+  color: var(--on-accent);
   font-weight: 600;
 }
 
@@ -332,7 +336,7 @@ button {
   border: 0;
   border-radius: 50%;
   background: var(--accent);
-  color: #0b0b10;
+  color: var(--on-accent);
   font-size: 1.6rem;
   cursor: pointer;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
@@ -427,7 +431,7 @@ button {
 }
 
 .track.current {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(34, 211, 230, 0.12);
 }
 
 .track-num {
@@ -587,7 +591,7 @@ button {
   align-items: center;
   gap: 16px;
   padding: 0 20px;
-  background: rgba(6, 6, 9, 0.92);
+  background: rgba(2, 24, 30, 0.92);
   border-top: 1px solid var(--border);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -642,8 +646,8 @@ button {
   height: 40px;
   border: 0;
   border-radius: 50%;
-  background: var(--text);
-  color: #0b0b10;
+  background: var(--accent);
+  color: var(--on-accent);
   font-size: 1.2rem;
   cursor: pointer;
   transition: transform 0.15s ease;
@@ -689,7 +693,7 @@ button {
   appearance: none;
   height: 4px;
   border-radius: 999px;
-  background: linear-gradient(to right, var(--accent) var(--fill), rgba(255, 255, 255, 0.2) var(--fill));
+  background: linear-gradient(to right, var(--accent) var(--fill), rgba(127, 240, 248, 0.2) var(--fill));
   cursor: pointer;
   outline: none;
 }
