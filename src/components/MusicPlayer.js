@@ -4,6 +4,7 @@ import {
   IoVolumeHigh, IoVolumeMute, IoSearch, IoDownloadOutline, IoMusicalNotes, IoMenu, IoClose,
 } from 'react-icons/io5';
 import CategoryScene from './CategoryScene';
+import SongArt from './SongArt';
 import { CATEGORIES, categorize } from '../categories';
 import { parseTrack } from '../trackInfo';
 
@@ -26,15 +27,6 @@ const formatTime = (sec) => {
   const m = Math.floor(sec / 60);
   const s = Math.floor(sec % 60);
   return `${m}:${String(s).padStart(2, '0')}`;
-};
-
-const Cover = ({ category, size = 'sm' }) => {
-  const c = CATEGORIES[category];
-  return (
-    <div className={`cover cover-${size}`} style={{ background: c.art }} aria-hidden="true">
-      <span>{c.emoji}</span>
-    </div>
-  );
 };
 
 // Animated bars shown next to the song that is playing
@@ -336,7 +328,7 @@ const MediaPlayer = () => {
                   <span className="hover-icon">{isCurrent && playing ? <IoPause /> : <IoPlay />}</span>
                 </button>
                 <button className="track-main" onClick={() => playTrack(audio)}>
-                  <Cover category={audio.category} />
+                  <SongArt track={audio} />
                   <span className="track-text">
                     <span className="track-name">{audio.name}</span>
                     <span className="track-artist">{audio.artist || c.label}</span>
@@ -358,7 +350,7 @@ const MediaPlayer = () => {
         <div className="pb-track">
           {currentAudio && (
             <>
-              <Cover category={currentAudio.category} size="md" />
+              <SongArt track={currentAudio} size="md" />
               <div className="pb-text">
                 <strong>{currentAudio.name}</strong>
                 <small>{currentAudio.artist || category.label}</small>
