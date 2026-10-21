@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   IoPlay, IoPause, IoPlaySkipForward, IoPlaySkipBack, IoShuffle, IoRepeat,
-  IoVolumeHigh, IoVolumeMute, IoSearch, IoDownloadOutline, IoMusicalNotes,
+  IoVolumeHigh, IoVolumeMute, IoSearch, IoDownloadOutline, IoMusicalNotes, IoMenu, IoClose,
 } from 'react-icons/io5';
 import CategoryScene from './CategoryScene';
 import { CATEGORIES, categorize } from '../categories';
@@ -55,6 +55,14 @@ const MediaPlayer = () => {
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.9);
   const [muted, setMuted] = useState(false);
+  // Sidebar starts open on wide screens; the choice is remembered per browser
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sidebarOpen');
+      if (saved !== null) return saved === 'true';
+    } catch (e) { /* storage unavailable */ }
+    return window.innerWidth > 760;
+  });
   const audioRef = useRef(null);
   const audioCtxRef = useRef(null);
   const analyserRef = useRef(null);
@@ -205,19 +213,37 @@ const MediaPlayer = () => {
   const countFor = (key) => audioFiles.filter((a) => a.category === key).length;
   const progress = duration ? (time / duration) * 100 : 0;
 
+  const toggleSidebar = () => {
+    const next = !sidebarOpen;
+    setSidebarOpen(next);
+    try {
+      localStorage.setItem('sidebarOpen', String(next));
+    } catch (e) { /* storage unavailable */ }
+  };
+
+  // On phones the sidebar is an overlay drawer, so picking a category closes it
+  const pickFilter = (key) => {
+    setFilter(key);
+    if (window.innerWidth <= 760 && sidebarOpen) toggleSidebar();
+  };
+
   return (
-    <div className="app-shell">
+    <div className={sidebarOpen ? 'app-shell' : 'app-shell sidebar-hidden'}>
       <CategoryScene category={currentAudio?.category} playing={playing} analyserRef={analyserRef} />
       <div className="scrim" />
+      {sidebarOpen && <div className="drawer-backdrop" onClick={toggleSidebar} />}
 
-      <aside className="sidebar">
+      <aside className="sidebar" aria-hidden={!sidebarOpen}>
         <div className="brand">
           <span className="brand-icon"><IoMusicalNotes /></span>
           MPlayer
+          <button className="icon-btn sidebar-close" onClick={toggleSidebar} aria-label="Hide sidebar" title="Hide sidebar">
+            <IoClose />
+          </button>
         </div>
         <p className="nav-heading">Your library</p>
         <nav className="nav">
-          <button className={filter === 'all' ? 'nav-item active' : 'nav-item'} onClick={() => setFilter('all')}>
+          <button className={filter === 'all' ? 'nav-item active' : 'nav-item'} onClick={() => pickFilter('all')}>
             <span className="nav-cover" style={{ background: 'linear-gradient(135deg, #7ff0f8, #0e7490)' }}>🎵</span>
             <span className="nav-text">
               <strong>All Songs</strong>
@@ -225,7 +251,7 @@ const MediaPlayer = () => {
             </span>
           </button>
           {Object.entries(CATEGORIES).map(([key, c]) => (
-            <button key={key} className={filter === key ? 'nav-item active' : 'nav-item'} onClick={() => setFilter(key)}>
+            <button key={key} className={filter === key ? 'nav-item active' : 'nav-item'} onClick={() => pickFilter(key)}>
               <span className="nav-cover" style={{ background: c.art }}>{c.emoji}</span>
               <span className="nav-text">
                 <strong>{c.label}</strong>
@@ -239,6 +265,14 @@ const MediaPlayer = () => {
 
       <main className="main">
         <div className="topbar">
+          <button
+            className={sidebarOpen ? 'icon-btn menu-btn on' : 'icon-btn menu-btn'}
+            onClick={toggleSidebar}
+            aria-label={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
+            title={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
+          >
+            <IoMenu />
+          </button>
           <label className="search">
             <IoSearch />
             <input
