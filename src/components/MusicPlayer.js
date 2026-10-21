@@ -14,7 +14,7 @@ const importAll = (r) => {
 };
 
 // Import audio files from the 'src/audio' directory
-const audioFiles = importAll(require.context('../audio', false, /\.(mp3|m4a)$/));
+const audioFiles = importAll(require.context('../audio', false, /\.(mp3|m4a|aac|mp4)$/i));
 
 const MediaPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
