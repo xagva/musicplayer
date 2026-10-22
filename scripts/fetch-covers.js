@@ -69,7 +69,17 @@ const lookup = async ({ name, artist }) => {
   const { parseTrack } = await import(`data:text/javascript,${encodeURIComponent(src)}`);
 
   fs.mkdirSync(OUT_DIR, { recursive: true });
-  const cache = fs.existsSync(CACHE_FILE) ? JSON.parse(fs.readFileSync(CACHE_FILE, 'utf8')) : {};
+  let cache = {};
+  try {
+    cache = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf8'));
+  } catch (e) {
+    // Missing or damaged cache: covers already on disk are still picked up below
+  }
+  // Write to a temp file and rename so an interrupted run can't leave a half-written cache
+  const saveCache = () => {
+    fs.writeFileSync(`${CACHE_FILE}.tmp`, JSON.stringify(cache, null, 2));
+    fs.renameSync(`${CACHE_FILE}.tmp`, CACHE_FILE);
+  };
   const files = fs.readdirSync(AUDIO_DIR).filter((f) => /\.(mp3|m4a|aac|mp4)$/i.test(f));
   const map = {};
   const stats = { embedded: 0, itunes: 0, missing: 0 };
@@ -79,9 +89,10 @@ const lookup = async ({ name, artist }) => {
     const outPath = path.join(ROOT, 'public', out);
     const cached = cache[file];
 
-    if (cached && cached !== 'none' && fs.existsSync(outPath)) {
+    if (fs.existsSync(outPath)) {
       map[file] = out;
-      stats[cached] += 1;
+      if (!cached || cached === 'none') cache[file] = 'itunes';
+      stats[cache[file]] += 1;
       continue;
     }
     if (cached === 'none') {
@@ -123,9 +134,10 @@ const lookup = async ({ name, artist }) => {
       map[file] = out;
     }
     console.log(`[${i + 1}/${files.length}] ${source.padEnd(8)} ${file}`);
-    fs.writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 2));
+    saveCache();
   }
 
+  saveCache();
   fs.writeFileSync(MAP_FILE, JSON.stringify(map, null, 2));
   console.log(`\nDone: ${stats.embedded} embedded, ${stats.itunes} from iTunes, ${stats.missing} without art`);
 })();
