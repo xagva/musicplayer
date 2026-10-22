@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   IoPlay, IoPause, IoPlaySkipForward, IoPlaySkipBack, IoShuffle, IoRepeat,
-  IoVolumeHigh, IoVolumeMute, IoSearch, IoDownloadOutline, IoMusicalNotes, IoMenu, IoClose,
+  IoVolumeHigh, IoVolumeMute, IoSearch, IoDownloadOutline, IoMusicalNotes,
+  IoChevronDown, IoChevronUp, IoChevronBack, IoChevronForward,
 } from 'react-icons/io5';
 import CategoryScene from './CategoryScene';
 import SongArt from './SongArt';
@@ -32,12 +33,72 @@ const formatTime = (sec) => {
   return `${m}:${String(s).padStart(2, '0')}`;
 };
 
-// Animated bars shown next to the song that is playing
+// Stable per-song number so "popular" tie-breaks don't reshuffle on every render
+const hashOf = (s) => {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+};
+
+const loadJSON = (key, fallback) => {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : fallback;
+  } catch (e) {
+    return fallback;
+  }
+};
+
+const saveJSON = (key, value) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (e) { /* storage unavailable */ }
+};
+
+// Animated bars shown on the song that is playing
 const Equalizer = ({ paused }) => (
   <span className={paused ? 'eq paused' : 'eq'} aria-hidden="true">
     <i /><i /><i />
   </span>
 );
+
+const Card = ({ track, active, playing, onSelect }) => (
+  <button className={active ? 'card active' : 'card'} onClick={() => onSelect(track)}>
+    <span className="card-art">
+      <SongArt track={track} size="card" />
+      <span className="card-play" aria-hidden="true">{active && playing ? <IoPause /> : <IoPlay className="nudge" />}</span>
+      {active && <span className="card-eq"><Equalizer paused={!playing} /></span>}
+    </span>
+    <span className="card-title">{track.name}</span>
+    <span className="card-sub">{track.artist || CATEGORIES[track.category].label}</span>
+  </button>
+);
+
+// A titled, horizontally scrolling row of cards
+const Shelf = ({ eyebrow, title, tracks, onMore, renderCard, big = false }) => {
+  const rowRef = useRef(null);
+  const scroll = (dir) => rowRef.current?.scrollBy({ left: dir * rowRef.current.clientWidth * 0.85, behavior: 'smooth' });
+  if (!tracks.length) return null;
+  return (
+    <section className="shelf">
+      <div className="shelf-head">
+        <div>
+          {eyebrow && <span className="eyebrow">{eyebrow}</span>}
+          <h2>{title}</h2>
+        </div>
+        <div className="shelf-actions">
+          {onMore && <button className="more-btn" onClick={onMore}>More</button>}
+          <button className="icon-btn round" onClick={() => scroll(-1)} aria-label="Scroll left"><IoChevronBack /></button>
+          <button className="icon-btn round" onClick={() => scroll(1)} aria-label="Scroll right"><IoChevronForward /></button>
+        </div>
+      </div>
+      <div className={big ? 'shelf-row big' : 'shelf-row'} ref={rowRef}>{tracks.map(renderCard)}</div>
+    </section>
+  );
+};
 
 const MediaPlayer = () => {
   const [currentAudio, setCurrentAudio] = useState(audioFiles[0] || null);
@@ -50,24 +111,23 @@ const MediaPlayer = () => {
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.9);
   const [muted, setMuted] = useState(false);
-  // Sidebar starts open on wide screens; the choice is remembered per browser
-  const [sidebarOpen, setSidebarOpen] = useState(() => {
-    try {
-      const saved = localStorage.getItem('sidebarOpen');
-      if (saved !== null) return saved === 'true';
-    } catch (e) { /* storage unavailable */ }
-    return window.innerWidth > 760;
-  });
+  const [nowOpen, setNowOpen] = useState(false);
+  const [playCounts, setPlayCounts] = useState(() => loadJSON('playCounts', {}));
+  const [recent, setRecent] = useState(() => loadJSON('recent', []));
   const audioRef = useRef(null);
   const audioCtxRef = useRef(null);
   const analyserRef = useRef(null);
   const autoplayRef = useRef(false);
 
+  // Most played first; before there is any history, songs with real covers and artists lead
+  const popularity = (t) => (playCounts[t.title] || 0) * 1000 + (t.cover ? 100 : 0) + (t.artist ? 50 : 0) + (hashOf(t.title) % 50);
+  const byPopularity = (list) => [...list].sort((a, b) => popularity(b) - popularity(a));
+
   const q = query.trim().toLowerCase();
-  const visibleTracks = audioFiles.filter(
+  const visibleTracks = byPopularity(audioFiles.filter(
     (a) => (filter === 'all' || a.category === filter)
       && (!q || `${a.name} ${a.artist} ${a.title}`.toLowerCase().includes(q)),
-  );
+  ));
 
   useEffect(() => {
     if (!currentAudio) console.error('No audio files found!');
@@ -119,6 +179,19 @@ const MediaPlayer = () => {
     audioCtxRef.current.resume();
   };
 
+  const recordPlay = (track) => {
+    setPlayCounts((prev) => {
+      const next = { ...prev, [track.title]: (prev[track.title] || 0) + 1 };
+      saveJSON('playCounts', next);
+      return next;
+    });
+    setRecent((prev) => {
+      const next = [track.title, ...prev.filter((t) => t !== track.title)].slice(0, 20);
+      saveJSON('recent', next);
+      return next;
+    });
+  };
+
   const togglePlay = () => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -135,7 +208,15 @@ const MediaPlayer = () => {
     }
     connectAnalyser();
     autoplayRef.current = true;
+    recordPlay(track);
     setCurrentAudio(track);
+  };
+
+  // Picking a song plays it and opens the full-screen view
+  const selectTrack = (track) => {
+    if (track.url !== currentAudio?.url) playTrack(track);
+    else if (audioRef.current?.paused) togglePlay();
+    setNowOpen(true);
   };
 
   // Next/previous stay inside the current view when the playing song is in it
@@ -180,16 +261,17 @@ const MediaPlayer = () => {
     if (visibleTracks.length === 0) return;
     const inView = visibleTracks.some((a) => a.url === currentAudio?.url);
     if (inView) togglePlay();
-    else playTrack(shuffle ? visibleTracks[Math.floor(Math.random() * visibleTracks.length)] : visibleTracks[0]);
+    else selectTrack(shuffle ? visibleTracks[Math.floor(Math.random() * visibleTracks.length)] : visibleTracks[0]);
   };
 
-  // Space bar toggles playback (unless typing in the search box)
+  // Space toggles playback (unless typing); Escape closes the full-screen view
   useEffect(() => {
     const onKey = (e) => {
       if (e.code === 'Space' && !['INPUT', 'TEXTAREA', 'BUTTON'].includes(e.target.tagName)) {
         e.preventDefault();
         togglePlay();
       }
+      if (e.key === 'Escape') setNowOpen(false);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -201,167 +283,132 @@ const MediaPlayer = () => {
     navigator.mediaSession.setActionHandler('previoustrack', playPrev);
   });
 
-  const category = currentAudio ? CATEGORIES[currentAudio.category] : null;
-  const view = filter === 'all'
-    ? { label: 'All Songs', emoji: '🎵', art: 'linear-gradient(135deg, #7ff0f8, #22d3e6 45%, #0e7490)', tagline: 'Everything in your library' }
-    : CATEGORIES[filter];
-  const viewPlaying = playing && visibleTracks.some((a) => a.url === currentAudio?.url);
-  const countFor = (key) => audioFiles.filter((a) => a.category === key).length;
-  const progress = duration ? (time / duration) * 100 : 0;
-
-  const toggleSidebar = () => {
-    const next = !sidebarOpen;
-    setSidebarOpen(next);
-    try {
-      localStorage.setItem('sidebarOpen', String(next));
-    } catch (e) { /* storage unavailable */ }
-  };
-
-  // On phones the sidebar is an overlay drawer, so picking a category closes it
-  const pickFilter = (key) => {
+  const pickGenre = (key) => {
     setFilter(key);
-    if (window.innerWidth <= 760 && sidebarOpen) toggleSidebar();
+    setQuery('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  return (
-    <div className={sidebarOpen ? 'app-shell' : 'app-shell sidebar-hidden'}>
-      <CategoryScene category={currentAudio?.category} playing={playing} analyserRef={analyserRef} />
-      <div className="scrim" />
-      {sidebarOpen && <div className="drawer-backdrop" onClick={toggleSidebar} />}
+  const category = currentAudio ? CATEGORIES[currentAudio.category] : null;
+  const viewPlaying = playing && visibleTracks.some((a) => a.url === currentAudio?.url);
+  const progress = duration ? (time / duration) * 100 : 0;
+  const recentTracks = recent.map((title) => audioFiles.find((a) => a.title === title)).filter(Boolean);
 
-      <aside className="sidebar" aria-hidden={!sidebarOpen}>
-        <div className="brand">
-          <span className="brand-icon"><IoMusicalNotes /></span>
-          MPlayer
-          <button className="icon-btn sidebar-close" onClick={toggleSidebar} aria-label="Hide sidebar" title="Hide sidebar">
-            <IoClose />
-          </button>
-        </div>
-        <p className="nav-heading">Your library</p>
-        <nav className="nav">
-          <button className={filter === 'all' ? 'nav-item active' : 'nav-item'} onClick={() => pickFilter('all')}>
-            <span className="nav-cover" style={{ background: 'linear-gradient(135deg, #7ff0f8, #0e7490)' }}>🎵</span>
-            <span className="nav-text">
-              <strong>All Songs</strong>
-              <small>{audioFiles.length} songs</small>
-            </span>
-          </button>
-          {Object.entries(CATEGORIES).map(([key, c]) => (
-            <button key={key} className={filter === key ? 'nav-item active' : 'nav-item'} onClick={() => pickFilter(key)}>
-              <span className="nav-cover" style={{ background: c.art }}>{c.emoji}</span>
-              <span className="nav-text">
-                <strong>{c.label}</strong>
-                <small>{countFor(key)} songs</small>
-              </span>
-              {playing && currentAudio?.category === key && <Equalizer />}
-            </button>
-          ))}
-        </nav>
-      </aside>
+  const renderCard = (track) => (
+    <Card key={track.url} track={track} active={currentAudio?.url === track.url} playing={playing} onSelect={selectTrack} />
+  );
 
-      <main className="main">
-        <div className="topbar">
-          <button
-            className={sidebarOpen ? 'icon-btn menu-btn on' : 'icon-btn menu-btn'}
-            onClick={toggleSidebar}
-            aria-label={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
-            title={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
-          >
-            <IoMenu />
-          </button>
-          <label className="search">
-            <IoSearch />
-            <input
-              type="search"
-              placeholder="Search songs, artists, films"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </label>
-        </div>
-
-        <div className="chips">
-          <button className={filter === 'all' ? 'chip active' : 'chip'} onClick={() => setFilter('all')}>All</button>
-          {Object.entries(CATEGORIES).map(([key, c]) => (
-            <button key={key} className={filter === key ? 'chip active' : 'chip'} onClick={() => setFilter(key)}>
-              {c.emoji} {c.label}
-            </button>
-          ))}
-        </div>
-
-        <header className="hero">
-          <div className="cover cover-lg" style={{ background: view.art }} aria-hidden="true">
-            <span>{view.emoji}</span>
+  let content;
+  if (q || filter !== 'all') {
+    const genre = CATEGORIES[filter];
+    content = (
+      <>
+        <header className="genre-hero" style={{ '--g': genre ? genre.accent : 'var(--accent)' }}>
+          <div>
+            <span className="eyebrow">{q ? 'Search' : 'Genre'}</span>
+            <h1>{q ? `“${query.trim()}”` : `${genre.emoji} ${genre.label}`}</h1>
+            <p>{q ? `${visibleTracks.length} songs found${genre ? ` in ${genre.label}` : ''}` : `${genre.tagline} · ${visibleTracks.length} songs`}</p>
           </div>
-          <div className="hero-text">
-            <span className="eyebrow">Playlist</span>
-            <h1>{view.label}</h1>
-            <p>{view.tagline} · {visibleTracks.length} songs</p>
+          <div className="actions">
+            <button className="play-big" onClick={playView} aria-label={viewPlaying ? 'Pause' : 'Play'} disabled={!visibleTracks.length}>
+              {viewPlaying ? <IoPause /> : <IoPlay className="nudge" />}
+            </button>
+            <button className={shuffle ? 'icon-btn on' : 'icon-btn'} onClick={() => setShuffle(!shuffle)} aria-label="Shuffle" title="Shuffle">
+              <IoShuffle />
+            </button>
           </div>
         </header>
+        {visibleTracks.length === 0 ? <p className="empty">No songs match “{query}”.</p> : <div className="grid">{visibleTracks.map(renderCard)}</div>}
+      </>
+    );
+  } else {
+    content = (
+      <>
+        <Shelf eyebrow="Pick up where you left off" title="Listen again" tracks={recentTracks} renderCard={renderCard} />
+        <Shelf eyebrow="From your library" title="Popular picks" tracks={byPopularity(audioFiles).slice(0, 18)} renderCard={renderCard} big />
+        {Object.entries(CATEGORIES).map(([key, c]) => (
+          <Shelf
+            key={key}
+            eyebrow={c.tagline}
+            title={`${c.emoji} ${c.label}`}
+            tracks={byPopularity(audioFiles.filter((a) => a.category === key)).slice(0, 14)}
+            onMore={() => pickGenre(key)}
+            renderCard={renderCard}
+          />
+        ))}
+      </>
+    );
+  }
 
-        <div className="actions">
-          <button className="play-big" onClick={playView} aria-label={viewPlaying ? 'Pause' : 'Play'} disabled={!visibleTracks.length}>
-            {viewPlaying ? <IoPause /> : <IoPlay className="nudge" />}
-          </button>
-          <button className={shuffle ? 'icon-btn on' : 'icon-btn'} onClick={() => setShuffle(!shuffle)} aria-label="Shuffle" title="Shuffle">
-            <IoShuffle />
-          </button>
-        </div>
+  return (
+    <div className={nowOpen ? 'app-shell now-open' : 'app-shell'}>
+      <header className="topbar">
+        <button className="brand" onClick={() => pickGenre('all')}>
+          <span className="brand-icon"><IoMusicalNotes /></span>
+          MPlayer
+        </button>
+        <label className="search">
+          <IoSearch />
+          <input
+            type="search"
+            placeholder="Search songs, artists, films"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </label>
+      </header>
 
-        <div className="tracklist" role="list">
-          <div className="track-head">
-            <span>#</span>
-            <span>Title</span>
-            <span className="col-cat">Mood</span>
-            <span />
+      <nav className="genre-bar" aria-label="Genres">
+        <button className={filter === 'all' ? 'chip active' : 'chip'} onClick={() => pickGenre('all')}>Home</button>
+        {Object.entries(CATEGORIES).map(([key, c]) => (
+          <button key={key} className={filter === key ? 'chip active' : 'chip'} onClick={() => pickGenre(key)}>
+            {c.emoji} {c.label}
+          </button>
+        ))}
+      </nav>
+
+      <main className="main">{content}</main>
+
+      {nowOpen && currentAudio && (
+        <div className="now" role="dialog" aria-modal="true" aria-label={`Now playing: ${currentAudio.name}`}>
+          <div className="now-bg">
+            {currentAudio.cover
+              ? <img key={currentAudio.url} className="now-bg-img" src={currentAudio.cover} alt="" />
+              : <CategoryScene category={currentAudio.category} playing={playing} analyserRef={analyserRef} />}
+            <div className="now-shade" />
           </div>
-          {visibleTracks.length === 0 && <p className="empty">No songs match “{query}”.</p>}
-          {visibleTracks.map((audio, index) => {
-            const isCurrent = currentAudio?.url === audio.url;
-            const c = CATEGORIES[audio.category];
-            return (
-              <div
-                key={audio.url}
-                role="listitem"
-                className={isCurrent ? 'track current' : 'track'}
-                onDoubleClick={() => playTrack(audio)}
-              >
-                <button className="track-num" onClick={() => playTrack(audio)} aria-label={`Play ${audio.name}`}>
-                  {isCurrent ? <Equalizer paused={!playing} /> : <span className="num">{index + 1}</span>}
-                  <span className="hover-icon">{isCurrent && playing ? <IoPause /> : <IoPlay />}</span>
-                </button>
-                <button className="track-main" onClick={() => playTrack(audio)}>
-                  <SongArt track={audio} />
-                  <span className="track-text">
-                    <span className="track-name">{audio.name}</span>
-                    <span className="track-artist">{audio.artist || c.label}</span>
-                  </span>
-                </button>
-                <span className="col-cat">
-                  <span className="pill" style={{ '--pill': c.accent }}>{c.emoji} {c.label}</span>
-                </span>
-                <a href={audio.url} download className="download" aria-label={`Download ${audio.name}`} title="Download">
-                  <IoDownloadOutline />
-                </a>
-              </div>
-            );
-          })}
+          <button className="icon-btn now-close" onClick={() => setNowOpen(false)} aria-label="Close now playing" title="Close">
+            <IoChevronDown />
+          </button>
+          <div className="now-body" key={currentAudio.url}>
+            <div className={playing ? 'now-art playing' : 'now-art'}>
+              <SongArt track={currentAudio} size="xl" />
+            </div>
+            <div className="now-meta">
+              <span className="pill" style={{ '--pill': category.accent }}>{category.emoji} {category.label}</span>
+              <h2>{currentAudio.name}</h2>
+              <p>{currentAudio.artist || category.label}</p>
+              <a href={currentAudio.url} download className="now-download">
+                <IoDownloadOutline /> Download
+              </a>
+            </div>
+          </div>
         </div>
-      </main>
+      )}
 
       <footer className="playerbar">
-        <div className="pb-track">
+        <button className="pb-track" onClick={() => setNowOpen(!nowOpen)} aria-label={nowOpen ? 'Close now playing' : 'Open now playing'}>
           {currentAudio && (
             <>
               <SongArt track={currentAudio} size="md" />
-              <div className="pb-text">
+              <span className="pb-text">
                 <strong>{currentAudio.name}</strong>
                 <small>{currentAudio.artist || category.label}</small>
-              </div>
+              </span>
+              <span className="pb-expand">{nowOpen ? <IoChevronDown /> : <IoChevronUp />}</span>
             </>
           )}
-        </div>
+        </button>
 
         <div className="pb-center">
           <div className="pb-controls">
@@ -404,7 +451,6 @@ const MediaPlayer = () => {
         </div>
 
         <div className="pb-right">
-          {category && <span className="pill" style={{ '--pill': category.accent }}>{category.emoji} {category.label}</span>}
           <button className="icon-btn" onClick={() => setMuted(!muted)} aria-label={muted ? 'Unmute' : 'Mute'}>
             {muted || volume === 0 ? <IoVolumeMute /> : <IoVolumeHigh />}
           </button>
